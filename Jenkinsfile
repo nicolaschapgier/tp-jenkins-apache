@@ -3,11 +3,6 @@ pipeline {
     agent {
         label 'agent-vm'
     }
-    
-    environment{
-        IMAGE_NAME = "mon-image-site-web"
-        CONTENEUR_NAME = "mon-conteneur-site-web"
-    }
 
 
     stages {

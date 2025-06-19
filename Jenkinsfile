@@ -1,32 +1,39 @@
 pipeline {
-    
     agent {
         label 'agent-vm'
     }
-
-
+    
     stages {
-        stage('Install apache2'){
+        stage('Verifier et installer apache2') {
             steps {
-                echo "Installing Apache2..."
-                sh "sudo apt-get install -y apache2"
-                echo "Apache2 installed."
-            }
-        } 
-        stage('Copy'){
-            steps {
-                echo "Copying files..."
-                sh "sudo cp index.html /var/www/html/"
-                echo "Files copied."
+                sh '''
+                    if [ ! -f /usr/sbin/apache2 ]; then
+                        sudo apt update
+                        sudo apt install -y apache2
+                    fi
+                '''
             }
         }
-        stage('Restart Apache2'){
+        
+        stage('Copier index.html') {
             steps {
-                echo "Stop Apache2 if it is running..."
-                sh "sudo systemctl restart apache2"
+                sh 'sudo cp index.html /var/www/html/index.html'
             }
         }
-   }
+        
+        stage('Redémarrer Apache2') {
+            steps {
+                sh 'sudo systemctl restart apache2'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Déploiement HTML effectué et Apache redémarré.'
+        }
+        failure {
+            echo 'Une erreur est survenue pendant le déploiement.'
+        }
+    }
 }
-
-
